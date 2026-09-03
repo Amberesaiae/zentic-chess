@@ -23,6 +23,13 @@ docker build -t zentic-chess .
 docker run --rm -p 8787:8787 -e OPENAI_API_KEY="your_key" zentic-chess
 ```
 
+## Render
+
+`render.yaml` defines the `zentic-chess` web service. Import the repository as
+a Render Blueprint or create a web service from the repository, then add a
+secret `OPENAI_API_KEY` in the Render dashboard environment settings. The key
+is intentionally not stored in the Blueprint.
+
 ## Production checklist
 
 - Set `OPENAI_API_KEY` only in the deployment secret manager.
