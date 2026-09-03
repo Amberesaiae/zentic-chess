@@ -2,7 +2,8 @@
 
 ## Status
 
-Accepted
+Superseded in part by [ADR 0002](0002-shared-agent-action-layer.md). Browser
+agents remain first-class, while voice is now an optional second adapter.
 
 ## Context
 
@@ -47,5 +48,5 @@ in-app chat pane that pretends to connect to a model.
 
 ## Follow-up
 
-An in-app provider may be added later only as an `OpponentService` adapter that
-uses the same proposal and match-command boundaries.
+The shared agent action layer now provides the common boundary for browser and
+voice adapters. A future in-app provider must use that same boundary.
