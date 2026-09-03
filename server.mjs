@@ -1,4 +1,6 @@
 import { createServer } from "node:http";
+import { readFile } from "node:fs/promises";
+import { extname, join, normalize } from "node:path";
 
 const port = Number(process.env.VOICE_PORT ?? 8787);
 const instructions = "You are Zentic, a conservative chess coach. Keep answers to one or two sentences unless asked for more. Never claim an unverified move is legal. When asked to start the Scandinavian lesson, explain that it replaces the current board and ask for a clear yes before doing so. Do not autoplay moves; propose them with a concise reason.";
@@ -10,10 +12,16 @@ const tools = [
 ];
 const analysisCache = new Map();
 let analysisInFlight = false;
+const dist = join(process.cwd(), "dist");
+const mimeTypes = { ".css": "text/css", ".html": "text/html", ".js": "text/javascript", ".json": "application/json", ".svg": "image/svg+xml", ".woff2": "font/woff2" };
 
 createServer(async (request, response) => {
+  if (request.method === "GET") {
+    await serveStatic(request, response);
+    return;
+  }
   if (request.method !== "POST") {
-    response.writeHead(404).end();
+    response.writeHead(405).end();
     return;
   }
   if (request.url === "/api/analysis/cloud") {
@@ -79,4 +87,25 @@ async function readJson(request) {
   let text = "";
   for await (const chunk of request) text += chunk;
   try { return JSON.parse(text); } catch { return {}; }
+}
+
+async function serveStatic(request, response) {
+  const pathname = new URL(request.url, "http://localhost").pathname;
+  const relative = pathname === "/" ? "index.html" : normalize(pathname).replace(/^[/\\]+/, "");
+  const path = join(dist, relative);
+  if (!path.startsWith(dist)) {
+    response.writeHead(403).end();
+    return;
+  }
+  try {
+    const file = await readFile(path);
+    response.writeHead(200, { "content-type": mimeTypes[extname(path)] ?? "application/octet-stream" }).end(file);
+  } catch {
+    try {
+      const index = await readFile(join(dist, "index.html"));
+      response.writeHead(200, { "content-type": "text/html" }).end(index);
+    } catch {
+      response.writeHead(404, { "content-type": "text/plain" }).end("Build the app before starting the production server.");
+    }
+  }
 }

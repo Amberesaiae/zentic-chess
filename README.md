@@ -53,6 +53,7 @@ The Vite server proxies `/api` to the voice server at port `8787`. See
 - [WebMCP contract](docs/WEBMCP.md)
 - [Voice integration](docs/VOICE.md)
 - [Demo script](docs/DEMO.md)
+- [Deployment](docs/DEPLOYMENT.md)
 - [Design system](docs/DESIGN-SYSTEM.md)
 - [Contributing](CONTRIBUTING.md)
 - [Domain glossary](CONTEXT.md)
