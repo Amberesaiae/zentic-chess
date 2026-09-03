@@ -14,6 +14,8 @@ that remains. It replaces the original speculative implementation plan.
 - WebMCP tools register only for Browser agent matches.
 - Curated training scenarios are validated `chess.js` positions.
 - A WebRTC client and server-side Realtime credential boundary exist for voice.
+- Cached Lichess cloud analysis is available to agents for positions already
+  covered by the public analysis database.
 - Unit tests cover legal human moves, local computer turns, proposals, stale
   writes, policy enforcement, and the Scandinavian scenario.
 
@@ -28,7 +30,8 @@ that remains. It replaces the original speculative implementation plan.
 
 ## Next foundations
 
-1. Add a Stockfish WebAssembly analysis adapter, clearly labeled as analysis.
+1. Add a local Stockfish WebAssembly fallback for positions missing cloud
+   analysis, with licensing and worker-delivery requirements resolved.
 2. Add scenario data and tests for additional opening lessons.
 3. Add browser-level smoke tests for game setup, proposal review, and responsive
    layout.

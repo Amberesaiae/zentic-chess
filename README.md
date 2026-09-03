@@ -13,6 +13,8 @@ leaves a concise note, proposes a move, and cannot bypass the game rules.
 - Versioned agent proposals: a move is tied to one board position and becomes
   invalid if the position changes.
 - A curated Scandinavian Defence training scenario.
+- Cached Lichess cloud analysis for positions that already have an engine
+  evaluation, exposed safely to WebMCP agents.
 - An optional voice-coach integration boundary using OpenAI Realtime over
   WebRTC. It is disabled safely until a server-side key is configured.
 

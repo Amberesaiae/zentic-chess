@@ -8,9 +8,19 @@ const tools = [
   { type: "function", name: "post_agent_note", description: "Leave a concise, visible coaching note in the game record.", parameters: { type: "object", properties: { expectedVersion: { type: "number" }, text: { type: "string" }, kind: { type: "string", enum: ["analysis", "status"] } }, required: ["expectedVersion", "text", "kind"], additionalProperties: false } },
   { type: "function", name: "start_training_scenario", description: "Load the curated Scandinavian training position after the user explicitly confirms that replacing the board is okay.", parameters: { type: "object", properties: { scenarioId: { type: "string", enum: ["scandinavian-queen-chase"] } }, required: ["scenarioId"], additionalProperties: false } },
 ];
+const analysisCache = new Map();
+let analysisInFlight = false;
 
 createServer(async (request, response) => {
-  if (request.method !== "POST" || request.url !== "/api/realtime/session") {
+  if (request.method !== "POST") {
+    response.writeHead(404).end();
+    return;
+  }
+  if (request.url === "/api/analysis/cloud") {
+    await serveCloudAnalysis(request, response);
+    return;
+  }
+  if (request.url !== "/api/realtime/session") {
     response.writeHead(404).end();
     return;
   }
@@ -31,3 +41,42 @@ createServer(async (request, response) => {
     response.writeHead(502, { "content-type": "application/json" }).end(JSON.stringify({ error: error instanceof Error ? error.message : "Voice session could not be created." }));
   }
 }).listen(port, () => console.log(`Zentic voice server listening on ${port}`));
+
+async function serveCloudAnalysis(request, response) {
+  const body = await readJson(request);
+  if (typeof body.fen !== "string" || body.fen.length > 200) {
+    response.writeHead(400, { "content-type": "application/json" }).end(JSON.stringify({ error: "A valid FEN is required." }));
+    return;
+  }
+  const cached = analysisCache.get(body.fen);
+  if (cached && Date.now() - cached.savedAt < 60_000) {
+    response.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify(cached.value));
+    return;
+  }
+  if (analysisInFlight) {
+    response.writeHead(429, { "content-type": "application/json" }).end(JSON.stringify({ error: "Analysis is busy. Try again in a moment." }));
+    return;
+  }
+  analysisInFlight = true;
+  try {
+    const upstream = await fetch(`https://lichess.org/api/cloud-eval?multiPv=3&variant=standard&fen=${encodeURIComponent(body.fen)}`, { headers: { Accept: "application/json" } });
+    if (upstream.status === 404) {
+      response.writeHead(404, { "content-type": "application/json" }).end(JSON.stringify({ error: "No cached cloud analysis exists for this position." }));
+      return;
+    }
+    if (!upstream.ok) throw new Error(`Cloud analysis returned ${upstream.status}.`);
+    const value = await upstream.json();
+    analysisCache.set(body.fen, { savedAt: Date.now(), value });
+    response.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify(value));
+  } catch (error) {
+    response.writeHead(502, { "content-type": "application/json" }).end(JSON.stringify({ error: error instanceof Error ? error.message : "Cloud analysis could not be reached." }));
+  } finally {
+    analysisInFlight = false;
+  }
+}
+
+async function readJson(request) {
+  let text = "";
+  for await (const chunk of request) text += chunk;
+  try { return JSON.parse(text); } catch { return {}; }
+}

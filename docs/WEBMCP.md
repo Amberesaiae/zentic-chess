@@ -22,6 +22,7 @@ the board from pixels.
 | `list_legal_moves` | Reads structured legal moves | Requires `expectedVersion` |
 | `list_match_activity` | Returns new visible events after a board version | Read-only |
 | `export_match_pgn` | Returns the portable PGN move record | Read-only |
+| `get_cloud_analysis` | Requests cached, external engine analysis for a position | Requires `expectedVersion`; may be unavailable |
 | `post_agent_note` | Adds a visible note | Requires `expectedVersion` |
 | `propose_agent_move` | Creates a visible move proposal | Legal move and version required |
 | `commit_agent_move` | Applies an existing proposal | Allowed only under `agent_may_play` |
@@ -40,6 +41,10 @@ the board from pixels.
 | `illegal_move` | The proposed move is not legal | Use `list_legal_moves` again |
 | `proposal_missing` | The proposal was dismissed or replaced | Read the match |
 | `policy_denied` | Session permissions do not allow the action | Propose instead of committing |
+
+`get_cloud_analysis` may also return an unavailable result when Lichess has no
+cached evaluation for a position or the shared endpoint is rate-limited. Agents
+must not invent an engine score in either case.
 
 ## Example: proposal-first move
 

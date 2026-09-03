@@ -1,12 +1,13 @@
 import type { MatchController } from "../../domain/chess/match-controller";
 import { createAgentActions } from "../../domain/chess/agent-actions";
+import { requestCloudAnalysis } from "../analysis/cloud-analysis";
 
 type ToolDefinition = {
   name: string;
   description: string;
   inputSchema: object;
   readOnly?: boolean;
-  execute: (input: Record<string, unknown>) => unknown;
+  execute: (input: Record<string, unknown>) => unknown | Promise<unknown>;
 };
 
 type ModelContext = {
@@ -68,6 +69,17 @@ export function registerMatchTools(controller: MatchController, onStatus: (statu
       description: "Return the current portable PGN move record. This is read-only and does not alter the match.",
       inputSchema: { type: "object", properties: {}, additionalProperties: false },
       execute: actions.getPgn,
+    },
+    {
+      name: "get_cloud_analysis",
+      description: "Request cached Lichess cloud analysis for the exact current position. Returns depth and UCI principal variations when available, otherwise a truthful unavailable result. This never changes the board.",
+      inputSchema: versionSchema,
+      execute: async (input) => {
+        const expectedVersion = number(input.expectedVersion);
+        const state = actions.readMatch();
+        if (state.positionVersion !== expectedVersion) return { error: "stale_position", message: `Read position v${state.positionVersion} before requesting analysis.` };
+        return { positionVersion: expectedVersion, analysis: await requestCloudAnalysis(state.fen) };
+      },
     },
     {
       name: "post_agent_note",
@@ -174,7 +186,7 @@ export function registerMatchTools(controller: MatchController, onStatus: (statu
     description: tool.description,
     inputSchema: tool.inputSchema,
     annotations: { readOnlyHint: tool.readOnly ?? true },
-    execute: async (input: Record<string, unknown>) => JSON.stringify(tool.execute(input)),
+    execute: async (input: Record<string, unknown>) => JSON.stringify(await tool.execute(input)),
   }, { signal: abortController.signal }))).then(
     () => onStatus("ready"),
     () => onStatus("error"),

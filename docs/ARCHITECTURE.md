@@ -20,6 +20,8 @@ React match table                 Browser agent
      versioned MatchState and activity record
 
 Optional voice client -> OpenAI Realtime -> same agent action layer
+
+Optional cloud analysis -> local API cache -> Lichess cloud evaluation
 ```
 
 ## Source map
@@ -30,6 +32,7 @@ Optional voice client -> OpenAI Realtime -> same agent action layer
 | Agent boundary | `src/domain/chess/agent-actions.ts` | Shared, safe operations available to adapters |
 | WebMCP | `src/integrations/webmcp/` | Browser-agent tool registration |
 | Voice | `src/integrations/voice/`, `server.mjs` | WebRTC session and temporary server credentials |
+| Cloud analysis | `src/integrations/analysis/`, `server.mjs` | Cached external engine variations with truthful cache misses |
 | Application state | `src/hooks/use-match.ts` | Subscribes React to the controller and runs local computer replies |
 | UI | `src/components/` | Lobby, board, players, match header, activity rail, voice control |
 
