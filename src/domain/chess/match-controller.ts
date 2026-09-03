@@ -54,7 +54,7 @@ export class MatchController {
       status: this.chess.turn() === scenario.humanColor ? "awaiting_human" : "awaiting_agent",
       proposedMove: undefined,
       result: undefined,
-      training: { id: scenario.id, title: scenario.title, summary: scenario.summary, prompt: scenario.prompt },
+      training: { id: scenario.id, title: scenario.title, summary: scenario.summary, prompt: scenario.prompt, objective: scenario.objective, hintLevel: 0, completed: false },
       activity: [{
         id: "training-start",
         actor: "system",
@@ -97,6 +97,21 @@ export class MatchController {
     this.assertTurn(this.state.humanColor);
     const move = this.applyMove(input);
     this.completeMove(move, "human", "human_move", `You played ${move.san}.`);
+    this.completeTrainingIfSolved(input);
+  }
+
+  revealTrainingHint(expectedVersion: number) {
+    this.assertVersion(expectedVersion);
+    const training = this.state.training;
+    if (!training || training.completed) throw new MatchError("policy_denied", "There is no active training objective to hint.");
+    const scenario = TRAINING_SCENARIOS[training.id];
+    const hint = scenario.hints[training.hintLevel];
+    if (!hint) throw new MatchError("policy_denied", "All available hints have already been revealed.");
+    const hintLevel = training.hintLevel + 1;
+    this.state = { ...this.state, training: { ...training, hintLevel } };
+    this.appendActivity({ actor: "agent", kind: "agent_note", title: `Hint ${hintLevel}`, detail: hint });
+    this.emit();
+    return { positionVersion: this.state.positionVersion, hintLevel, hint };
   }
 
   playComputerMove() {
@@ -237,6 +252,16 @@ export class MatchController {
       result,
     };
     this.appendActivity({ actor, kind, title, detail, move: record, positionVersion: nextVersion });
+    this.emit();
+  }
+
+  private completeTrainingIfSolved(input: MoveInput) {
+    const training = this.state.training;
+    if (!training || training.completed) return;
+    const scenario = TRAINING_SCENARIOS[training.id];
+    if (scenario.solution.from !== input.from || scenario.solution.to !== input.to) return;
+    this.state = { ...this.state, training: { ...training, completed: true } };
+    this.appendActivity({ actor: "system", kind: "system", title: "Objective met", detail: `${scenario.solution.san} develops with tempo against the queen.` });
     this.emit();
   }
 

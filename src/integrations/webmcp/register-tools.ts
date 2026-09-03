@@ -142,6 +142,19 @@ export function registerMatchTools(controller: MatchController, onStatus: (statu
       execute: actions.availableTraining,
     },
     {
+      name: "get_training_state",
+      description: "Read the active lesson objective, visible prompt, current hint level, and completion state. Returns null when no lesson is active.",
+      inputSchema: { type: "object", properties: {}, additionalProperties: false },
+      execute: actions.getTrainingState,
+    },
+    {
+      name: "reveal_training_hint",
+      description: "Reveal exactly one progressive hint for the current lesson after the learner asks for help. The hint is recorded visibly in the match activity.",
+      readOnly: false,
+      inputSchema: versionSchema,
+      execute: (input) => actions.revealTrainingHint(number(input.expectedVersion)),
+    },
+    {
       name: "start_training_scenario",
       description: "Start a curated chess training position only after the user asks to begin it. This replaces the current board, so first explain the scenario and obtain confirmation in conversation.",
       readOnly: false,

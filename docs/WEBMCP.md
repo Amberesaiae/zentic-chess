@@ -27,6 +27,8 @@ the board from pixels.
 | `commit_agent_move` | Applies an existing proposal | Allowed only under `agent_may_play` |
 | `withdraw_agent_proposal` | Withdraws the agent's pending proposal | Does not alter the board |
 | `list_training_scenarios` | Lists curated lessons before suggesting one | Read-only |
+| `get_training_state` | Reads active lesson objective and completion state | Read-only |
+| `reveal_training_hint` | Reveals one learner-requested progressive hint | Requires `expectedVersion` |
 | `start_training_scenario` | Replaces the board with a curated drill | Explicit user confirmation required |
 
 ## Error contract

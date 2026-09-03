@@ -30,6 +30,8 @@ export function createAgentActions(controller: MatchController) {
       const state = controller.getSnapshot();
       return { positionVersion: state.positionVersion, training: state.training, fen: state.fen };
     },
+    getTrainingState: () => controller.getSnapshot().training,
+    revealTrainingHint: (expectedVersion: number) => controller.revealTrainingHint(expectedVersion),
     availableTraining: () => Object.values(TRAINING_SCENARIOS).map(({ id, title, summary }) => ({ id, title, summary })),
   };
 }
@@ -47,6 +49,7 @@ function capabilitiesFor(state: MatchState) {
     canCommitProposal: state.mode === "agent" && state.status === "agent_proposed" && state.sessionPolicy === "agent_may_play",
     canWithdrawProposal: Boolean(state.proposedMove),
     canStartTraining: true,
+    canRevealHint: Boolean(state.training && !state.training.completed),
     requiresHumanConfirmation: ["start_training_scenario", "commit_agent_move"],
     currentProposal: state.proposedMove ? proposalSummary(state.proposedMove) : undefined,
   };

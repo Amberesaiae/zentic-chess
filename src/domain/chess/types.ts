@@ -51,6 +51,14 @@ export type TrainingScenario = {
   prompt: string;
   fen: string;
   humanColor: Color;
+  objective: string;
+  hints: string[];
+  solution: { from: Square; to: Square; san: string };
+};
+
+export type TrainingProgress = Pick<TrainingScenario, "id" | "title" | "summary" | "prompt" | "objective"> & {
+  hintLevel: number;
+  completed: boolean;
 };
 
 export type MatchState = {
@@ -70,7 +78,7 @@ export type MatchState = {
   proposedMove?: AgentProposal;
   activity: ActivityEntry[];
   result?: MatchResult;
-  training?: Pick<TrainingScenario, "id" | "title" | "summary" | "prompt">;
+  training?: TrainingProgress;
 };
 
 export type MatchConfig = {

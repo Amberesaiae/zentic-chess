@@ -8,5 +8,8 @@ export const TRAINING_SCENARIOS: Record<TrainingScenario["id"], TrainingScenario
     prompt: "Black has recovered the pawn with the queen. Find the forcing move that develops a piece and gains time on the queen.",
     fen: "rnb1kbnr/pppp1ppp/8/3q4/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 3",
     humanColor: "w",
+    objective: "Develop with tempo against Black's exposed queen.",
+    hints: ["Which White minor piece can develop immediately?", "Look at the knight on b1 and the queen on d5.", "Nc3 develops the knight and attacks Black's queen."],
+    solution: { from: "b1", to: "c3", san: "Nc3" },
   },
 };

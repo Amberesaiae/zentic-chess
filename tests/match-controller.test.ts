@@ -94,4 +94,16 @@ describe("MatchController", () => {
 
     expect(match.getSnapshot()).toMatchObject({ fen, status: "awaiting_agent", proposedMove: undefined });
   });
+
+  it("reveals progressive training hints and marks the objective complete on Nc3", () => {
+    const match = agentMatch();
+    const actions = createAgentActions(match);
+    actions.startTrainingScenario("scandinavian-queen-chase");
+
+    expect(actions.revealTrainingHint(0)).toMatchObject({ hintLevel: 1, hint: "Which White minor piece can develop immediately?" });
+    match.submitHumanMove({ from: "b1", to: "c3" });
+
+    expect(actions.getTrainingState()).toMatchObject({ completed: true, hintLevel: 1 });
+    expect(match.getSnapshot().activity.at(-1)).toMatchObject({ title: "Objective met" });
+  });
 });
