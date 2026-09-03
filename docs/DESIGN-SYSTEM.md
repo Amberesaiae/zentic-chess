@@ -8,16 +8,32 @@ wizard, or a Chess.com clone.
 
 ## Visual language
 
-- **Palette:** porcelain canvas, white surfaces, ink text, and one restrained
-  iris-blue action accent.
-- **Board:** pale slate and periwinkle squares; board state has stronger visual
-  priority than all side information.
+- **Palette:** porcelain canvas, white surfaces, deep mineral-blue structure,
+  and a single vermilion action accent. Blue is environmental, never an
+  indiscriminate "AI glow."
+- **Board:** pale slate and mineral-blue squares; board state has stronger
+  visual priority than all side information.
 - **Type:** Manrope is the interface face; DM Mono is restricted to notation
   and compact metadata. Headlines use an editorial rhythm only on setup.
 - **Shape:** 8px to 16px rounded structural surfaces, with borders used before
   shadows. Buttons, cards, and board frame share this scale.
-- **Density:** the setup screen is calm; the match screen becomes denser only
-  where live information is useful.
+- **Density:** the landing screen is spacious and art-directed; game setup is
+  calm; the match screen becomes denser only where live information is useful.
+
+## Landing art direction
+
+The landing surface uses a local, original 3D chess scene in an
+aquarium-gallery setting (`public/assets/zentic-aquarium-chess.png`). It is a
+product introduction, not a replacement for the game board. The visual role is
+to establish materiality, focus, and calm before a player makes a decision.
+
+- Keep the art framed on large screens and stacked below the product story on
+  small screens.
+- Crop the image to the chess objects only. Generated placeholder UI must never
+  become visible in the shipped scene.
+- Use slow water-light motion only as a reduced-motion-safe atmospheric layer.
+- Do not add fish, game neon, floating particles, or decorative metrics; the
+  aquarium reference is about glass, light, and depth rather than a theme.
 
 ## Hierarchy rules
 
@@ -37,6 +53,8 @@ wizard, or a Chess.com clone.
 | Component | Purpose |
 | --- | --- |
 | `Button` | Shared semantic action surface, including a Radix `Slot` composition path |
+| `LobbyIntro` | Landing story, value proposition, and direct path to configuration |
+| `LobbyScene` | Isolated 3D chess art and reduced-motion-safe water-light layer |
 | Setup selectors | Choose a concrete game configuration with visible selected state |
 | `LiveBoard` | Rule-backed board with selection, legal destinations, last move, and proposal overlays |
 | `PlayerSlot` | Human and opponent identity, captures, and clock state |
@@ -57,3 +75,5 @@ wizard, or a Chess.com clone.
   anonymous statistics.
 - No dark hacker aesthetic or technical metadata posed as product hierarchy.
 - No agent action presented as real unless it reached the validated controller.
+- No 3D art inside the playable board: gameplay needs legible coordinates,
+  stable interaction, and rule-backed move state above visual spectacle.
