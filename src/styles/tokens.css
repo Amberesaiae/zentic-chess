@@ -1,0 +1,20 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap");
+@import "tailwindcss";
+
+:root { --canvas:#f4f5f7; --surface:#ffffff; --surface-raised:#fafbfc; --surface-active:#eef0ff; --surface-note:#f8f9fb; --line:#e1e5ea; --line-strong:#c9d0da; --ink:#1d2430; --muted:#667385; --accent:#495cc9; --accent-strong:#394bb7; --accent-soft:#e7eaff; --danger:#b84755; font-family:"Manrope",sans-serif; color:var(--ink); background:var(--canvas); font-synthesis:none; }
+* { box-sizing:border-box; }
+body { min-width:320px; min-height:100vh; margin:0; overflow-x:clip; background:var(--canvas); }
+button,input,select { font:inherit; }
+button { cursor:pointer; }
+button:focus-visible,select:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+.wordmark { display:flex; align-items:center; gap:8px; white-space:nowrap; font:700 13px "DM Mono",monospace; letter-spacing:.13em; }
+.wordmark > span { display:grid; width:28px; height:28px; place-items:center; color:#fff; background:var(--ink); border-radius:8px; font:800 16px/1 "Manrope",sans-serif; letter-spacing:0; }
+.wordmark i { width:1px; height:17px; background:var(--line-strong); }
+.wordmark small { color:var(--muted); font:500 9px "DM Mono",monospace; letter-spacing:.09em; }
+.ui-button { display:inline-flex; min-height:38px; align-items:center; justify-content:center; gap:7px; padding:0 13px; border:1px solid transparent; border-radius:9px; background:transparent; color:inherit; font-size:11px; font-weight:750; transition:transform .14s ease,background .14s ease,border-color .14s ease,box-shadow .14s ease; }
+.ui-button:active { transform:translateY(1px); }
+.primary-button { color:#fff; background:var(--accent); border-color:var(--accent); box-shadow:0 1px 2px rgba(37,51,128,.2); }
+.primary-button:hover,.start-button:hover { background:var(--accent-strong); }
+.quiet-button { color:var(--ink); border-color:var(--line); background:var(--surface); }
+.quiet-button:hover { border-color:#abb5c2; background:var(--surface-raised); }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; transition-duration:0ms!important; animation-duration:0ms!important; } }
