@@ -46,6 +46,8 @@ change the latter, and update the Vite proxy if you do.
   Defense`, `Qxd5`, `FEN`, and `en passant` to reduce transcription errors.
 - The interface shows the last transcript or coach response; it does not hide
   voice-triggered board actions.
+- A voice request to load a training scenario creates a visible confirmation
+  prompt. The board is not replaced until the player selects `Load lesson`.
 
 ## Development limits
 
@@ -53,3 +55,6 @@ change the latter, and update the Vite proxy if you do.
 - A provider key is not included in this repository.
 - Realtime behavior and provider billing must be tested with a real key before
   a demo. Keep the no-key `503` response as the expected local fallback.
+- Tool calls are executed in the active browser session for this prototype.
+  A multi-user production deployment must move authorization and match state to
+  a server-owned session before enabling unattended voice actions.

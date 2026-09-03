@@ -9,6 +9,7 @@ export function VoiceCoach({ actions }: { actions: AgentActions }) {
   const [status, setStatus] = useState<"idle" | "connecting" | "listening" | "thinking" | "ready" | "error">("idle");
   const [transcript, setTranscript] = useState("");
   const [reply, setReply] = useState("");
+  const [pendingScenario, setPendingScenario] = useState<"scandinavian-queen-chase">();
 
   async function start() {
     try {
@@ -22,7 +23,10 @@ export function VoiceCoach({ actions }: { actions: AgentActions }) {
         onToolCall: (name, input) => {
           if (name === "read_match") return actions.readMatch();
           if (name === "list_legal_moves") return actions.listLegalMoves(number(input.expectedVersion));
-          if (name === "start_training_scenario") return actions.startTrainingScenario("scandinavian-queen-chase");
+          if (name === "start_training_scenario") {
+            setPendingScenario("scandinavian-queen-chase");
+            return { pendingConfirmation: true, message: "The player must confirm replacing the board with this lesson." };
+          }
           if (name === "post_agent_note") return actions.addNote(number(input.expectedVersion), string(input.text), input.kind === "status" ? "status" : "analysis");
           throw new Error(`Voice coach cannot perform ${name}.`);
         },
@@ -40,9 +44,17 @@ export function VoiceCoach({ actions }: { actions: AgentActions }) {
     setStatus("idle");
   }
 
+  function confirmScenario() {
+    if (!pendingScenario) return;
+    actions.startTrainingScenario(pendingScenario);
+    setPendingScenario(undefined);
+    setReply("The Scandinavian lesson is ready on the board.");
+  }
+
   return <section className="voice-coach" aria-label="Live voice coach">
     <div><span className={`voice-indicator ${status}`} aria-hidden="true" /><strong>Talk to your coach</strong><p>{status === "idle" ? "Ask for a position, a drill, or one clear explanation." : status === "error" ? reply : status === "thinking" ? "Thinking through the position..." : status === "listening" ? "Listening" : status === "connecting" ? "Connecting securely..." : "Listening and ready to respond."}</p></div>
     {session ? <Button className="quiet-button icon-button" onClick={stop} aria-label="Stop voice coach" title="Stop voice coach"><StopCircle size={19} weight="fill" /></Button> : <Button className="primary-button voice-button" onClick={() => void start()} disabled={status === "connecting"}><Microphone size={18} weight="fill" /> Talk</Button>}
+    {pendingScenario && <div className="voice-confirmation"><strong>Replace this board with the Scandinavian lesson?</strong><p>The current match position will be discarded.</p><div><Button className="quiet-button" onClick={() => setPendingScenario(undefined)}>Not now</Button><Button className="primary-button" onClick={confirmScenario}>Load lesson</Button></div></div>}
     {(transcript || (reply && status !== "error")) && <div className="voice-transcript"><span>{transcript ? "You" : "Coach"}</span><p>{transcript || reply}</p></div>}
   </section>;
 }

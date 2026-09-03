@@ -20,6 +20,11 @@
 .voice-transcript { grid-column:1 / -1; padding:10px 11px; border:1px solid #dbe0fb; border-radius:9px; background:rgba(255,255,255,.72); }
 .voice-transcript span { color:var(--accent-strong); font:500 9px "DM Mono",monospace; letter-spacing:.08em; }
 .voice-transcript p { margin-top:5px; color:var(--ink); }
+.voice-confirmation { grid-column:1 / -1; padding:12px; border:1px solid #c8d0f8; border-radius:10px; background:#fff; }
+.voice-confirmation strong { font-size:12px; }
+.voice-confirmation p { margin:4px 0 11px; }
+.voice-confirmation > div { display:flex; gap:7px; }
+.voice-confirmation .ui-button { min-height:34px; }
 .training-focus { padding:18px 21px; border-bottom:1px solid var(--line); background:#f7f8fb; }
 .training-focus.complete { background:#edf4ee; }
 .training-focus > span { color:var(--accent-strong); font:500 9px "DM Mono",monospace; letter-spacing:.08em; }
