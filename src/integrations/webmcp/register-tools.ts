@@ -42,10 +42,32 @@ export function registerMatchTools(controller: MatchController, onStatus: (statu
       execute: actions.readMatch,
     },
     {
+      name: "get_agent_capabilities",
+      description: "Read the exact coaching actions currently available, including whether a move can be proposed or committed and which actions require human confirmation.",
+      inputSchema: { type: "object", properties: {}, additionalProperties: false },
+      execute: actions.getCapabilities,
+    },
+    {
       name: "list_legal_moves",
       description: "List structured legal moves for the exact match position version. Read the match first, then pass that version.",
       inputSchema: versionSchema,
       execute: (input) => actions.listLegalMoves(number(input.expectedVersion)),
+    },
+    {
+      name: "list_match_activity",
+      description: "Read the visible game and coaching events that occurred after a position version. Use this to catch up without reinterpreting the board history.",
+      inputSchema: {
+        type: "object",
+        properties: { afterPositionVersion: { type: "number" } },
+        additionalProperties: false,
+      },
+      execute: (input) => actions.listActivity(optionalNumber(input.afterPositionVersion)),
+    },
+    {
+      name: "export_match_pgn",
+      description: "Return the current portable PGN move record. This is read-only and does not alter the match.",
+      inputSchema: { type: "object", properties: {}, additionalProperties: false },
+      execute: actions.getPgn,
     },
     {
       name: "post_agent_note",
@@ -102,6 +124,24 @@ export function registerMatchTools(controller: MatchController, onStatus: (statu
       },
     },
     {
+      name: "withdraw_agent_proposal",
+      description: "Withdraw the currently pending agent proposal when it is no longer appropriate. This does not change the board and lets the agent propose a better move.",
+      readOnly: false,
+      inputSchema: {
+        type: "object",
+        properties: { proposalId: { type: "string" } },
+        required: ["proposalId"],
+        additionalProperties: false,
+      },
+      execute: (input) => actions.withdrawProposal(string(input.proposalId)),
+    },
+    {
+      name: "list_training_scenarios",
+      description: "List the curated chess lessons that Zentic can safely place on the board. Use this before suggesting a lesson.",
+      inputSchema: { type: "object", properties: {}, additionalProperties: false },
+      execute: actions.availableTraining,
+    },
+    {
       name: "start_training_scenario",
       description: "Start a curated chess training position only after the user asks to begin it. This replaces the current board, so first explain the scenario and obtain confirmation in conversation.",
       readOnly: false,
@@ -142,4 +182,8 @@ function optionalString(value: unknown) {
 function number(value: unknown) {
   if (typeof value !== "number") throw new Error("Expected a numeric input.");
   return value;
+}
+
+function optionalNumber(value: unknown) {
+  return value === undefined ? undefined : number(value);
 }

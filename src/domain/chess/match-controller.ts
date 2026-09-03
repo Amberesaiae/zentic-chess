@@ -21,6 +21,14 @@ export class MatchController {
 
   getSnapshot = () => this.state;
 
+  getPgn() {
+    return this.chess.pgn();
+  }
+
+  listActivity(afterPositionVersion = -1) {
+    return this.state.activity.filter((entry) => entry.positionVersion > afterPositionVersion);
+  }
+
   reset(config: MatchConfig = this.configFromState()) {
     this.chess = new Chess();
     this.state = this.createInitialState(config);

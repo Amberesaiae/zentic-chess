@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { MatchController } from "../src/domain/chess/match-controller";
+import { createAgentActions } from "../src/domain/chess/agent-actions";
 import { MatchError } from "../src/domain/chess/types";
 
 describe("MatchController", () => {
@@ -68,5 +69,29 @@ describe("MatchController", () => {
       training: { id: "scandinavian-queen-chase" },
     });
     expect(match.listLegalMoves()).toContainEqual(expect.objectContaining({ san: "Nc3", from: "b1", to: "c3" }));
+  });
+
+  it("gives a coaching agent capabilities, a catch-up record, and a PGN export", () => {
+    const match = agentMatch();
+    const actions = createAgentActions(match);
+    match.submitHumanMove({ from: "e2", to: "e4" });
+
+    expect(actions.getCapabilities()).toMatchObject({ canProposeMove: true, canCommitProposal: false, canStartTraining: true });
+    expect(actions.listActivity(0)).toContainEqual(expect.objectContaining({ title: "You played e4." }));
+    expect(actions.getPgn()).toMatchObject({ positionVersion: 1 });
+    expect(actions.getPgn().pgn).toContain("1. e4 *");
+    expect(actions.availableTraining()).toContainEqual(expect.objectContaining({ id: "scandinavian-queen-chase" }));
+  });
+
+  it("lets an agent withdraw its pending proposal without altering the board", () => {
+    const match = agentMatch();
+    const actions = createAgentActions(match);
+    match.submitHumanMove({ from: "e2", to: "e4" });
+    const proposal = actions.proposeMove({ expectedVersion: 1, from: "e7", to: "e5", explanation: "Meet the centre directly." });
+    const fen = match.getSnapshot().fen;
+
+    actions.withdrawProposal(proposal.id);
+
+    expect(match.getSnapshot()).toMatchObject({ fen, status: "awaiting_agent", proposedMove: undefined });
   });
 });

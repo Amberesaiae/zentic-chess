@@ -18,10 +18,15 @@ the board from pixels.
 | Tool | Effect | Guard |
 | --- | --- | --- |
 | `read_match` | Reads the exact match snapshot | Read-only |
+| `get_agent_capabilities` | Shows the actions presently permitted by the match | Read-only |
 | `list_legal_moves` | Reads structured legal moves | Requires `expectedVersion` |
+| `list_match_activity` | Returns new visible events after a board version | Read-only |
+| `export_match_pgn` | Returns the portable PGN move record | Read-only |
 | `post_agent_note` | Adds a visible note | Requires `expectedVersion` |
 | `propose_agent_move` | Creates a visible move proposal | Legal move and version required |
 | `commit_agent_move` | Applies an existing proposal | Allowed only under `agent_may_play` |
+| `withdraw_agent_proposal` | Withdraws the agent's pending proposal | Does not alter the board |
+| `list_training_scenarios` | Lists curated lessons before suggesting one | Read-only |
 | `start_training_scenario` | Replaces the board with a curated drill | Explicit user confirmation required |
 
 ## Error contract
