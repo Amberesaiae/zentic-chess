@@ -34,7 +34,18 @@ let openingLibraryPromise;
 const openingSources = ["a", "b", "c", "d", "e"].map((volume) => `https://raw.githubusercontent.com/lichess-org/chess-openings/master/${volume}.tsv`);
 void getOpeningLibrary().catch(() => { openingLibraryPromise = undefined; });
 const dist = join(process.cwd(), "dist");
-const mimeTypes = { ".css": "text/css", ".html": "text/html", ".js": "text/javascript", ".json": "application/json", ".svg": "image/svg+xml", ".woff2": "font/woff2" };
+const mimeTypes = {
+  ".css": "text/css",
+  ".html": "text/html",
+  ".js": "text/javascript",
+  ".json": "application/json",
+  ".svg": "image/svg+xml",
+  ".webp": "image/webp",
+  ".png": "image/png",
+  ".mp3": "audio/mpeg",
+  ".ogg": "audio/ogg",
+  ".woff2": "font/woff2",
+};
 
 createServer(async (request, response) => {
   if (request.method === "GET") {
