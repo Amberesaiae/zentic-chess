@@ -1,9 +1,9 @@
 # Zentic
 
-Zentic is a shared chess table for a human and an agent that can inspect the
-actual game state. It is built to make agent chess assistance observable,
-bounded, and useful: the agent reads the live position, sees legal moves,
-leaves a concise note, proposes a move, and cannot bypass the game rules.
+Zentic is a negotiated-autonomy chess table for a human and an agent that can
+inspect the actual game state. A player defines a live play charter—objective,
+guardrails, and authority—and the agent must attach a visible decision receipt
+before a consequential move can be applied.
 
 ## What is working
 
@@ -12,6 +12,8 @@ leaves a concise note, proposes a move, and cannot bypass the game rules.
 - Browser-agent mode using WebMCP tools for exact game-state access.
 - Versioned agent proposals: a move is tied to one board position and becomes
   invalid if the position changes.
+- Play charters and decision receipts that make agent intent, tool evidence,
+  and one-move consent visible and reviewable.
 - A curated Scandinavian Defence training scenario.
 - Cached Lichess cloud analysis for positions that already have an engine
   evaluation, exposed safely to WebMCP agents.
@@ -50,6 +52,7 @@ The Vite server proxies `/api` to the voice server at port `8787`. See
 ## Project guides
 
 - [Architecture](docs/ARCHITECTURE.md)
+- [Negotiated autonomy](docs/NEGOTIATED-AUTONOMY.md)
 - [WebMCP contract](docs/WEBMCP.md)
 - [Voice integration](docs/VOICE.md)
 - [Demo script](docs/DEMO.md)

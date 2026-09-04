@@ -1,6 +1,7 @@
-import { Chessboard } from "react-chessboard";
-import type { Square } from "chess.js";
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { SpeakerHigh, SpeakerSlash } from "@phosphor-icons/react";
+import { Chess, type Square } from "chess.js";
+import { ChessBoard, type BoardArrow, type BoardMove, type MoveSound, type ValidMovesMap } from "react-shahmat";
+import { useEffect, useRef, useState } from "react";
 import type { AgentProposal, LegalMove, MoveRecord } from "../domain/chess/types";
 
 type Props = {
@@ -9,71 +10,88 @@ type Props = {
   lastMove?: MoveRecord;
   proposal?: AgentProposal;
   orientation: "white" | "black";
+  humanColor: "w" | "b";
   canMove: boolean;
   onMove: (from: Square, to: Square) => void;
 };
 
-export function LiveBoard({ fen, legalMoves, lastMove, proposal, orientation, canMove, onMove }: Props) {
-  const frameRef = useRef<HTMLElement>(null);
-  const [boardWidth, setBoardWidth] = useState(620);
-  const [selected, setSelected] = useState<Square>();
-  const selectedMoves = selected ? legalMoves.filter((move) => move.from === selected) : [];
-  const styles: Record<string, CSSProperties> = {};
+let soundContext: AudioContext | undefined;
 
-  if (lastMove) {
-    styles[lastMove.from] = { background: "rgba(73, 92, 201, .18)" };
-    styles[lastMove.to] = { background: "rgba(73, 92, 201, .34)" };
-  }
-  if (proposal) {
-    styles[proposal.move.from] = { ...styles[proposal.move.from], boxShadow: "inset 0 0 0 3px #495cc9" };
-    styles[proposal.move.to] = { ...styles[proposal.move.to], boxShadow: "inset 0 0 0 3px #495cc9", background: "repeating-linear-gradient(135deg, rgba(73,92,201,.36) 0 5px, rgba(73,92,201,.12) 5px 10px)" };
-  }
-  if (selected) styles[selected] = { ...styles[selected], boxShadow: "inset 0 0 0 3px #fdfdff" };
-  selectedMoves.forEach((move) => {
-    styles[move.to] = { ...styles[move.to], background: "radial-gradient(circle, rgba(44,57,88,.62) 0 15%, transparent 17%)" };
-  });
+export function LiveBoard({ fen, legalMoves, lastMove, proposal, orientation, humanColor, canMove, onMove }: Props) {
+  const [arrows, setArrows] = useState<BoardArrow[]>([]);
+  const [premove, setPremove] = useState<BoardMove>();
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const submittingMove = useRef(false);
+  const heardMove = useRef<string | undefined>(undefined);
+  const validMoves = legalMoves.reduce<ValidMovesMap>((moves, move) => {
+    moves.set(move.from, [...(moves.get(move.from) ?? []), move.to]);
+    return moves;
+  }, new Map());
+  const highlights = proposal ? [proposal.move.from, proposal.move.to] : [];
+  const game = new Chess(fen);
+  const gameEndOverlay = stateToOverlay(game);
+  const turnColor = fen.split(" ")[1] === "b" ? "black" : "white";
+  const check = game.isCheck() ? game.board().flat().find((piece) => piece?.type === "k" && piece.color === game.turn())?.square : undefined;
+  const displayedLastMove = lastMove ? { from: lastMove.from, to: lastMove.to, promotion: ({ q: "queen", r: "rook", b: "bishop", n: "knight" } as const)[lastMove.promotion ?? ""] } : undefined;
+  const displayedArrows = proposal ? [...arrows, { from: proposal.move.from, to: proposal.move.to }] : arrows;
 
   useEffect(() => {
-    const frame = frameRef.current;
-    if (!frame) return;
-    const update = () => setBoardWidth(Math.min(704, Math.floor(frame.getBoundingClientRect().width)));
-    update();
-    const observer = new ResizeObserver(update);
-    observer.observe(frame);
-    return () => observer.disconnect();
-  }, []);
+    submittingMove.current = false;
+  }, [fen]);
 
-  function selectSquare(square: Square) {
-    if (!canMove) return;
-    if (selected) {
-      const move = selectedMoves.find((candidate) => candidate.to === square);
-      if (move) {
-        onMove(move.from, move.to);
-        setSelected(undefined);
-        return;
-      }
-    }
-    setSelected(legalMoves.some((move) => move.from === square) ? square : undefined);
+  useEffect(() => {
+    if (!lastMove || lastMove.id === heardMove.current || !soundEnabled) return;
+    heardMove.current = lastMove.id;
+    playSound(lastMove.captured ? "capture" : lastMove.san.includes("+") ? "check" : "move");
+  }, [lastMove, soundEnabled]);
+
+  function stateToOverlay(currentGame: Chess) {
+    if (!currentGame.isGameOver()) return undefined;
+    return currentGame.isCheckmate() ? { type: "checkmate" as const, winner: currentGame.turn() === "w" ? "black" as const : "white" as const } : { type: currentGame.isStalemate() ? "stalemate" as const : "draw" as const };
   }
 
-  return <section className="board-field" ref={frameRef} aria-label="Chess board">
-    <div className="board-key"><span>LIVE POSITION</span><span>{canMove ? "SELECT OR DRAG A PIECE" : proposal ? "AGENT MOVE AWAITING REVIEW" : "BOARD LOCKED"}</span></div>
-    <Chessboard options={{
-      position: fen,
-      boardOrientation: orientation,
-      onPieceDrop: ({ sourceSquare, targetSquare }) => {
-        if (!canMove || !targetSquare) return false;
-        try { onMove(sourceSquare as Square, targetSquare as Square); setSelected(undefined); return true; } catch { return false; }
-      },
-      onSquareClick: ({ square }) => selectSquare(square as Square),
-      canDragPiece: ({ square }) => canMove && legalMoves.some((move) => move.from === square),
-      squareStyles: styles,
-      darkSquareStyle: { backgroundColor: "#8793b1" },
-      lightSquareStyle: { backgroundColor: "#eff1f6" },
-      animationDurationInMs: 180,
-      boardStyle: { width: `${boardWidth}px`, maxWidth: "100%" },
-      showNotation: true,
-    }} />
-    <p className="board-instruction" aria-live="polite">{selected ? `Selected ${selected}. Choose a highlighted legal destination.` : canMove ? "Your turn as White." : proposal ? `The agent proposed ${proposal.move.san}.` : "The agent can inspect this live position through WebMCP."}</p>
+  function submit(move: BoardMove) {
+    const isHumanTurn = turnColor === (humanColor === "w" ? "white" : "black");
+    if (!canMove || !isHumanTurn || submittingMove.current) {
+      setPremove(move);
+      return;
+    }
+    const legal = legalMoves.find((candidate) => candidate.from === move.from && candidate.to === move.to);
+    if (legal) {
+      setPremove(undefined);
+      void wakeAudio();
+      submittingMove.current = true;
+      onMove(legal.from, legal.to);
+    }
+  }
+
+  function playSound(sound: MoveSound) {
+    if (!soundEnabled || typeof window === "undefined") return;
+    const frequencies: Record<MoveSound, number> = { move: 392, capture: 185, check: 622, checkmate: 117, promotion: 784, draw: 262, premove: 330, error: 146, gamestart: 523 };
+    const context = soundContext ?? new window.AudioContext();
+    soundContext = context;
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.frequency.value = frequencies[sound];
+    oscillator.type = sound === "capture" || sound === "error" ? "sawtooth" : "sine";
+    gain.gain.setValueAtTime(0.0001, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.09, context.currentTime + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.18);
+    oscillator.connect(gain).connect(context.destination);
+    oscillator.start();
+    oscillator.stop(context.currentTime + 0.19);
+  }
+
+  async function wakeAudio() {
+    if (typeof window === "undefined") return;
+    const context = soundContext ?? new window.AudioContext();
+    soundContext = context;
+    if (context.state === "suspended") await context.resume();
+  }
+
+  return <section className="board-field" aria-label="Chess board">
+    <div className="board-key"><span>The board</span><div><span>{canMove ? "MAKE YOUR MOVE" : proposal ? "MOVE AWAITS APPROVAL" : gameEndOverlay ? "MATCH COMPLETE" : "ZENTIC IS READING"}</span><button className="sound-toggle" type="button" onClick={() => { void wakeAudio(); setSoundEnabled((enabled) => !enabled); }} aria-pressed={soundEnabled} aria-label={soundEnabled ? "Mute board sounds" : "Enable board sounds"}>{soundEnabled ? <SpeakerHigh size={16} weight="fill" /> : <SpeakerSlash size={16} weight="fill" />}</button></div></div>
+    <div className="shahmat-frame"><ChessBoard position={fen} orientation={orientation} turnColor={turnColor} validMoves={validMoves} lastMove={displayedLastMove} check={check} gameEndOverlay={gameEndOverlay} onMove={submit} onPremove={setPremove} whiteMovable={humanColor === "w"} blackMovable={humanColor === "b"} enablePremoves enableAnimations animationDuration={260} enableArrows arrows={displayedArrows} onArrowsChange={setArrows} highlights={highlights} enableHighlights showMoveIndicators showCoordinates highlightDropTarget className="zentic-shahmat" /></div>
+    <p className="board-instruction" aria-live="polite">{premove ? `Premove queued: ${premove.from} to ${premove.to}.` : canMove ? "Choose a piece, then choose its square." : proposal ? `Agent proposes ${proposal.move.san}.` : gameEndOverlay ? "The final position is locked." : "The board is synchronized for the next move."}</p>
   </section>;
 }

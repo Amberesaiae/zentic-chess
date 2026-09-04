@@ -2,9 +2,9 @@ import type { ComputerDifficulty, MatchMode, SessionPolicy } from "../domain/che
 import { SetupFieldset } from "./opponent-selector";
 
 const difficulties: { id: ComputerDifficulty; label: string; detail: string }[] = [
-  { id: "casual", label: "Casual", detail: "For a calm first game" },
-  { id: "club", label: "Club", detail: "Balanced practice opponent" },
-  { id: "tactical", label: "Tactical", detail: "Prioritises forcing moves" },
+  { id: "casual", label: "Learn", detail: "Development-first, forgiving replies" },
+  { id: "club", label: "Club", detail: "Looks one reply ahead before it plays" },
+  { id: "tactical", label: "Tactical", detail: "Looks deeper for forcing moves and loose material" },
 ];
 
 export function RulesSelector({ mode, difficulty, sessionPolicy, onDifficultyChange, onPolicyChange }: { mode: MatchMode; difficulty: ComputerDifficulty; sessionPolicy: SessionPolicy; onDifficultyChange: (value: ComputerDifficulty) => void; onPolicyChange: (value: SessionPolicy) => void }) {

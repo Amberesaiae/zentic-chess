@@ -1,5 +1,12 @@
 @import "./styles/tokens.css";
-@import "./styles/lobby.css";
+@import "./styles/landing/shell.css";
+@import "./styles/landing/nav.css";
+@import "./styles/landing/hero.css";
+@import "./styles/landing/flow.css";
+@import "./styles/landing/limits.css";
+@import "./styles/landing/scope.css";
+@import "./styles/landing/setup.css";
+@import "./styles/landing/footer.css";
 @import "./styles/match.css";
 @import "./styles/notebook.css";
 @import "./styles/responsive.css";

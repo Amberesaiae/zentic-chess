@@ -1,17 +1,20 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap");
 @import "tailwindcss";
 
-:root { --canvas:#f4f6f6; --surface:#ffffff; --surface-raised:#f8fbfb; --surface-active:#e7f1f2; --surface-note:#f1f7f7; --line:#d7e1e3; --line-strong:#b5c7cb; --ink:#102a32; --muted:#5e747a; --accent:#bd3c32; --accent-strong:#9c2e29; --accent-soft:#f8e8e5; --ocean:#195466; --ocean-deep:#0f3945; --danger:#b84755; font-family:"Manrope",sans-serif; color:var(--ink); background:var(--canvas); font-synthesis:none; }
+:root { --canvas:#e8c78f; --surface:#f0d7a8; --surface-raised:#f8e3bc; --surface-active:#d9ee25; --surface-note:#1d1c19; --line:rgba(28,25,20,.23); --line-strong:rgba(28,25,20,.46); --ink:#191813; --muted:#705f45; --accent:#d6ef12; --accent-strong:#abc200; --accent-soft:#eaf69a; --ocean:#f0641d; --ocean-deep:#163ca8; --danger:#c52f23; font-family:"Manrope",sans-serif; color:var(--ink); background:var(--canvas); font-synthesis:none; color-scheme:light; }
 * { box-sizing:border-box; }
 body { min-width:320px; min-height:100vh; margin:0; overflow-x:clip; background:var(--canvas); }
 button,input,select { font:inherit; }
 button { cursor:pointer; }
-button:focus-visible,select:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
-.wordmark { display:flex; align-items:center; gap:8px; white-space:nowrap; font:700 13px "DM Mono",monospace; letter-spacing:.13em; }
-.wordmark > span { display:grid; width:28px; height:28px; place-items:center; color:#fff; background:var(--ink); border-radius:8px; font:800 16px/1 "Manrope",sans-serif; letter-spacing:0; }
+a,button { touch-action:manipulation; }
+a:focus-visible,button:focus-visible,select:focus-visible,summary:focus-visible,input:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
+.skip-link { position:fixed; z-index:100; top:8px; left:8px; padding:9px 12px; color:#fffaf0; border-radius:4px; background:var(--ink); transform:translateY(-160%); transition:transform .15s ease; }
+.skip-link:focus { transform:translateY(0); }
+.wordmark { display:flex; align-items:center; gap:8px; white-space:nowrap; font-size:14px; font-weight:900; letter-spacing:.06em; }
+.wordmark > span { display:grid; width:28px; height:28px; place-items:center; color:var(--ink); background:var(--accent); border-radius:8px; font:900 16px/1 "Manrope",sans-serif; letter-spacing:0; }
 .wordmark i { width:1px; height:17px; background:var(--line-strong); }
-.wordmark small { color:var(--muted); font:500 9px "DM Mono",monospace; letter-spacing:.09em; }
-.ui-button { display:inline-flex; min-height:38px; align-items:center; justify-content:center; gap:7px; padding:0 13px; border:1px solid transparent; border-radius:9px; background:transparent; color:inherit; font-size:11px; font-weight:750; transition:transform .14s ease,background .14s ease,border-color .14s ease,box-shadow .14s ease; }
+.wordmark small { color:var(--muted); font-size:12px; font-weight:700; letter-spacing:.05em; }
+.ui-button { display:inline-flex; min-height:38px; align-items:center; justify-content:center; gap:7px; padding:0 13px; border:1px solid transparent; border-radius:9px; background:transparent; color:inherit; font-size:13px; font-weight:750; transition:transform .14s ease,background .14s ease,border-color .14s ease,box-shadow .14s ease; }
 .ui-button:active { transform:translateY(1px); }
 .primary-button { color:#fff; background:var(--accent); border-color:var(--accent); box-shadow:0 1px 2px rgba(37,51,128,.2); }
 .primary-button:hover,.start-button:hover { background:var(--accent-strong); }

@@ -5,7 +5,7 @@ export type SessionPolicy = "propose_only" | "agent_may_play";
 export type MatchMode = "computer" | "agent";
 export type ComputerDifficulty = "casual" | "club" | "tactical";
 export type TimeControl = "untimed" | "rapid_10" | "blitz_5";
-export type ActivityKind = "human_move" | "agent_note" | "agent_proposal" | "agent_move" | "system";
+export type ActivityKind = "human_move" | "agent_note" | "agent_proposal" | "agent_move" | "decision_receipt" | "consent" | "system";
 
 export type MoveRecord = {
   id: string;
@@ -42,21 +42,60 @@ export type ActivityEntry = {
   move?: Pick<MoveRecord, "san" | "from" | "to">;
 };
 
+export type McpTraceEntry = {
+  id: string;
+  tool: string;
+  positionVersion: number;
+  status: "complete" | "failed";
+  createdAt: string;
+};
+
+export type CharterAuthority = "explain" | "propose" | "one_move";
+
+export type PlayCharter = {
+  objective: string;
+  constraints: string[];
+  authority: CharterAuthority;
+  updatedAt: string;
+};
+
+export type DecisionReceipt = {
+  id: string;
+  proposalId: string;
+  positionVersion: number;
+  objective: string;
+  constraints: string[];
+  rationale: string;
+  toolEvidence: string[];
+  status: "proposed" | "consented" | "applied" | "withdrawn";
+  createdAt: string;
+};
+
+export type MoveConsent = {
+  proposalId: string;
+  positionVersion: number;
+  grantedAt: string;
+};
+
 export type MatchResult = { label: string; detail: string };
 
+export type TrainingScenarioId = "scandinavian-queen-chase" | "italian-central-break" | "knight-fork" | "mate-net";
+
 export type TrainingScenario = {
-  id: "scandinavian-queen-chase";
+  id: TrainingScenarioId;
   title: string;
   summary: string;
+  category: "opening" | "tactics" | "checkmate";
   prompt: string;
   fen: string;
   humanColor: Color;
   objective: string;
   hints: string[];
   solution: { from: Square; to: Square; san: string };
+  success: string;
 };
 
-export type TrainingProgress = Pick<TrainingScenario, "id" | "title" | "summary" | "prompt" | "objective"> & {
+export type TrainingProgress = Pick<TrainingScenario, "id" | "title" | "summary" | "category" | "prompt" | "objective"> & {
   hintLevel: number;
   completed: boolean;
 };
@@ -76,7 +115,11 @@ export type MatchState = {
   status: MatchStatus;
   sessionPolicy: SessionPolicy;
   proposedMove?: AgentProposal;
+  playCharter: PlayCharter;
+  decisionReceipts: DecisionReceipt[];
+  activeConsent?: MoveConsent;
   activity: ActivityEntry[];
+  mcpTrace: McpTraceEntry[];
   result?: MatchResult;
   training?: TrainingProgress;
 };

@@ -15,13 +15,13 @@ React match table                 Browser agent
                     |
               MatchController
                     |
-             chess.js rule engine
+       charter, receipts, consent, chess.js
                     |
      versioned MatchState and activity record
 
 Optional voice client -> OpenAI Realtime -> same agent action layer
 
-Optional cloud analysis -> local API cache -> Lichess cloud evaluation
+Practice engine -> bounded Lichess cloud evaluation -> validated local fallback
 ```
 
 ## Source map
@@ -44,6 +44,8 @@ Optional cloud analysis -> local API cache -> Lichess cloud evaluation
 4. A proposal belongs to one position version and is invalid after any move.
 5. `propose_only` requires a human to apply the proposal.
 6. Voice and WebMCP are capability adapters, not rule engines.
+7. An agent proposal requires a decision receipt before it can be applied.
+8. One-move consent is bound to one proposal and one position version.
 
 ## State lifecycle
 
@@ -53,9 +55,21 @@ awaiting_human -> awaiting_agent -> agent_proposed -> awaiting_human
        +------------- finished <--------+
 ```
 
-In a practice-computer match, `awaiting_agent` triggers the local deterministic
-practice response. In agent mode, an external browser agent or configured voice
-coach reads the position and chooses a bounded action.
+Within `agent_proposed`, the negotiated-autonomy protocol is:
+
+```text
+proposal -> decision receipt -> human applies
+                          \-> one-move consent -> agent commits
+```
+
+The charter and receipt are state owned by `MatchController`, not UI-local
+decorations. See [Negotiated autonomy](NEGOTIATED-AUTONOMY.md).
+
+In a practice-computer match, `awaiting_agent` triggers a bounded engine
+selection: Club and Tactical first request a Lichess cloud principal variation,
+then validate it against the local controller; a deterministic local search is
+the fallback. In agent mode, an external browser agent or configured voice coach
+reads the position and chooses a bounded action. See [Practice engine](PRACTICE-ENGINE.md).
 
 ## Training scenarios
 

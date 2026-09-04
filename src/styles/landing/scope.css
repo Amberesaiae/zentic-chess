@@ -1,0 +1,19 @@
+.honest-scope { display:grid; grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr); gap:clamp(32px,5vw,72px); align-items:center; }
+.honest-scope figure { position:relative; margin:0; overflow:hidden; border:2px solid var(--ink); border-radius:0; background:var(--ocean-deep); box-shadow:12px 12px 0 var(--ink); }
+.honest-scope figure::after { position:absolute; right:-12%; bottom:-18%; width:52%; height:42%; background:var(--accent); border-radius:50%; content:""; mix-blend-mode:screen; opacity:.75; }
+.honest-scope img { display:block; width:100%; height:100%; max-height:520px; object-fit:cover; object-position:center 42%; aspect-ratio:4/5; filter:saturate(.82) contrast(1.08); }
+.scope-copy dl { margin:28px 0 0; }
+.scope-copy dl > div { padding:20px 0; border-top:2px solid var(--ink); }
+.scope-copy dl > div:last-child { border-bottom:2px solid var(--ink); }
+.scope-copy dt { color:var(--ink); font:850 17px/1 "Manrope",sans-serif; letter-spacing:-.045em; }
+.scope-copy dd { max-width:56ch; margin:7px 0 0; color:var(--muted); font-size:13px; line-height:1.62; }
+@media (max-width:900px) { .honest-scope { grid-template-columns:minmax(0,1fr); gap:30px; } .honest-scope img { max-height:360px; aspect-ratio:16/10; object-position:center 38%; } }
+
+.match-reviews { display:grid; grid-template-columns:minmax(0,.8fr) minmax(340px,1.2fr); gap:clamp(32px,7vw,108px); align-items:center; padding:clamp(68px,10vw,130px) clamp(20px,5vw,72px); color:#f5e8cc; background:#151611; }
+.reviews-heading h2 { max-width:12ch; margin:12px 0 16px; color:#f5e8cc; font:900 clamp(30px,4vw,54px)/.95 "Manrope",sans-serif; letter-spacing:-.07em; }
+.reviews-heading > p:last-child { max-width:43ch; margin:0; color:#bcb292; font-size:14px; line-height:1.6; }
+.review-signals { display:grid; gap:0; margin:0; padding:0; list-style:none; border-top:1px solid rgba(245,232,204,.28); }
+.review-signals li { display:grid; grid-template-columns:84px 1fr; gap:20px; align-items:start; padding:22px 0; border-bottom:1px solid rgba(245,232,204,.28); }
+.review-signals li > span { color:var(--accent); font:900 21px/1 "Manrope",sans-serif; letter-spacing:-.06em; }
+.review-signals b { color:#f5e8cc; font:800 14px "Manrope",sans-serif; }.review-signals p { margin:5px 0 0; color:#aea485; font-size:13px; line-height:1.45; }
+@media (max-width:760px) { .match-reviews { grid-template-columns:1fr; gap:34px; padding:64px 20px; }.reviews-heading h2 { max-width:15ch; }.review-signals li { grid-template-columns:72px 1fr; gap:14px; } }
