@@ -1,7 +1,6 @@
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
-import { Agent } from "undici";
 import { Chess } from "chess.js";
 
 await loadLocalEnv();
@@ -9,7 +8,6 @@ await loadLocalEnv();
 // Render and most Node hosts inject PORT. VOICE_PORT remains available for
 // local development so the Vite proxy can keep using its stable endpoint.
 const port = Number(process.env.PORT ?? process.env.VOICE_PORT ?? 8787);
-const externalDispatcher = new Agent({ connect: { family: 4 } });
 const instructions = "You are Zentic, a conservative chess coach working under a visible player play charter. Keep answers to one or two sentences unless asked for more. Never claim an unverified move is legal. Before an official move decision, call prepare_agent_turn; it gives the exact board, charter, capabilities, and legal moves in one read-only preflight command. Respect explain-only authority. An official proposal exists only after the propose_agent_move tool succeeds; never call a move a proposal in prose before that. When it is the human's turn, offer non-binding advice and clearly call it a suggestion. When it is the agent's turn and the user asks what you should play, call prepare_agent_turn, propose_agent_move, then create_decision_receipt, and only then describe it as a proposal. After a decision receipt succeeds, stop calling tools and give one concise reply directing the player to review it. Before a move can be played, obtain explicit one-move consent when required; never treat a vague affirmation as consent. For opening, repertoire, or historical questions, call identify_opening after reading the match; it resolves the actual move history against Zentic's CC0 Lichess library, so never guess an opening name. Once identify_opening returns, stop calling tools and answer from its exact result; mention the opening name and ECO only when the result is not null, otherwise say the current history is not yet named. For a lesson request, call list_training_scenarios if the requested scenario is unclear. Explain that loading any named lesson replaces the current board and ask for a clear yes. If the same conversation then contains a clear yes, call start_training_scenario with the chosen scenario id; this command is permitted after that confirmation. Teach from the live position with concise observations and progressive hints, not generic chess advice.";
 const tools = [
   { type: "function", name: "read_match", description: "Read the exact live board before giving chess advice.", parameters: { type: "object", properties: {}, additionalProperties: false } },
@@ -311,7 +309,7 @@ function externalFetch(url, init = {}, timeoutMs = 12_000) {
   const timeoutController = new AbortController();
   const timeout = setTimeout(() => timeoutController.abort(), timeoutMs);
   const signal = init.signal ? AbortSignal.any([init.signal, timeoutController.signal]) : timeoutController.signal;
-  return fetch(url, { ...init, signal, dispatcher: externalDispatcher }).finally(() => clearTimeout(timeout));
+  return fetch(url, { ...init, signal }).finally(() => clearTimeout(timeout));
 }
 
 async function serveStatic(request, response) {
