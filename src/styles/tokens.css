@@ -1,13 +1,13 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap");
 @import "tailwindcss";
 
-:root { --canvas:#e8c78f; --surface:#f0d7a8; --surface-raised:#f8e3bc; --surface-active:#d9ee25; --surface-note:#1d1c19; --line:rgba(28,25,20,.23); --line-strong:rgba(28,25,20,.46); --ink:#191813; --muted:#705f45; --accent:#d6ef12; --accent-strong:#abc200; --accent-soft:#eaf69a; --ocean:#f0641d; --ocean-deep:#163ca8; --danger:#c52f23; font-family:"Manrope",sans-serif; color:var(--ink); background:var(--canvas); font-synthesis:none; color-scheme:light; }
+:root { --canvas:#e8c78f; --surface:#f0d7a8; --surface-raised:#f8e3bc; --surface-active:#d9ee25; --surface-note:#1d1c19; --line:rgba(28,25,20,.23); --line-strong:rgba(28,25,20,.46); --ink:#191813; --muted:#524430; --accent:#d6ef12; --accent-strong:#abc200; --accent-soft:#eaf69a; --ocean:#f0641d; --ocean-deep:#163ca8; --danger:#c52f23; font-family:"Manrope",sans-serif; color:var(--ink); background:var(--canvas); font-synthesis:none; color-scheme:light; }
 * { box-sizing:border-box; }
 body { min-width:320px; min-height:100vh; margin:0; overflow-x:clip; background:var(--canvas); }
 button,input,select { font:inherit; }
 button { cursor:pointer; }
 a,button { touch-action:manipulation; }
-a:focus-visible,button:focus-visible,select:focus-visible,summary:focus-visible,input:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
+a:focus-visible,button:focus-visible,select:focus-visible,summary:focus-visible,input:focus-visible { outline:2.5px solid var(--ink); outline-offset:2px; }
 .skip-link { position:fixed; z-index:100; top:8px; left:8px; padding:9px 12px; color:#fffaf0; border-radius:4px; background:var(--ink); transform:translateY(-160%); transition:transform .15s ease; }
 .skip-link:focus { transform:translateY(0); }
 .wordmark { display:flex; align-items:center; gap:8px; white-space:nowrap; font-size:14px; font-weight:900; letter-spacing:.06em; }

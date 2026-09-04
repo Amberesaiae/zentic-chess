@@ -7,7 +7,7 @@ const claims = [
 export function HonestScope() {
   return <section className="honest-scope" id="honest-scope" aria-labelledby="honest-scope-title">
     <figure>
-      <img src="/assets/zentic-queen-study.png" alt="A white queen resting on a dark stone base, lit from one side." width="1129" height="1411" loading="lazy" />
+      <img src="/assets/zentic-queen-study.webp" alt="A white queen resting on a dark stone base, lit from one side." width="1129" height="1411" loading="lazy" />
     </figure>
     <div className="scope-copy">
       <h2 id="honest-scope-title">What Zentic is not</h2>

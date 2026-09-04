@@ -1,4 +1,4 @@
-.landing { --page:1360px; --gutter:clamp(20px,5vw,52px); min-height:100dvh; background:radial-gradient(circle at 88% 10%,rgba(214,239,18,.36),transparent 19rem),linear-gradient(115deg,#e8c78f 0%,#f3dbb0 56%,#dfbc7d 100%); }
+.landing { --page:1360px; --gutter:clamp(20px,5vw,52px); min-height:100dvh; background:#141510; }
 .landing main > section { width:min(var(--page),100%); margin:0 auto; padding-inline:var(--gutter); }
 .landing main > section + section { margin-top:clamp(84px,12vh,156px); }
 .landing h2 { margin:0; font:850 clamp(28px,3.2vw,42px)/.98 "Manrope",sans-serif; letter-spacing:-.065em; text-wrap:balance; }

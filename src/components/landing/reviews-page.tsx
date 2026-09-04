@@ -55,12 +55,16 @@ export function ReviewsPage({ onNavigate, onPlay }: { onNavigate: (view: Landing
         <div className="review-interactive-stage">
           {/* Left: Move Timeline Selector */}
           <div className="review-timeline-col">
-            <span className="review-col-title">MOVE SEQUENCE</span>
-            <div className="review-moves-list" role="list">
+            <span className="review-col-title" id="moves-sequence-title">MOVE SEQUENCE</span>
+            <div className="review-moves-list" role="tablist" aria-labelledby="moves-sequence-title">
               {SAMPLE_GAME.map((m) => (
                 <button
                   key={m.ply}
                   type="button"
+                  role="tab"
+                  id={`review-move-tab-${m.ply}`}
+                  aria-selected={m.ply === selectedPly}
+                  aria-controls="review-selected-panel"
                   className={`review-move-btn ${m.ply === selectedPly ? "is-selected" : ""}`}
                   onClick={() => setSelectedPly(m.ply)}
                 >
@@ -72,7 +76,7 @@ export function ReviewsPage({ onNavigate, onPlay }: { onNavigate: (view: Landing
                 </button>
               ))}
             </div>
-            <div className="review-stepper-controls">
+            <div className="review-stepper-controls" aria-label="Review timeline controls">
               <button
                 type="button"
                 className="review-nav-btn"
@@ -80,9 +84,11 @@ export function ReviewsPage({ onNavigate, onPlay }: { onNavigate: (view: Landing
                 onClick={() => setSelectedPly((prev) => Math.max(1, prev - 1))}
                 aria-label="Previous move"
               >
-                <CaretLeft size={16} weight="bold" /> Prev
+                <CaretLeft size={16} weight="bold" aria-hidden="true" /> Prev
               </button>
-              <span className="review-step-count">{selectedPly} of {SAMPLE_GAME.length}</span>
+              <span className="review-step-count" aria-live="polite" aria-atomic="true">
+                {selectedPly} of {SAMPLE_GAME.length}
+              </span>
               <button
                 type="button"
                 className="review-nav-btn"
@@ -90,16 +96,23 @@ export function ReviewsPage({ onNavigate, onPlay }: { onNavigate: (view: Landing
                 onClick={() => setSelectedPly((prev) => Math.min(SAMPLE_GAME.length, prev + 1))}
                 aria-label="Next move"
               >
-                Next <CaretRight size={16} weight="bold" />
+                Next <CaretRight size={16} weight="bold" aria-hidden="true" />
               </button>
             </div>
           </div>
 
           {/* Right: Detailed Move Insight & Evaluation */}
-          <div className="review-insight-col">
-            <div className="review-eval-gauge">
+          <div className="review-insight-col" id="review-selected-panel" role="tabpanel" aria-labelledby={`review-move-tab-${selectedPly}`}>
+            <div className="review-eval-gauge" role="region" aria-label="Position evaluation gauge">
               <span className="eval-label">STOCKFISH &bull; WEBMCP EVALUATION</span>
-              <div className="eval-bar-track">
+              <div
+                className="eval-bar-track"
+                role="progressbar"
+                aria-valuenow={Math.round(Math.min(100, Math.max(0, 50 + currentMove.evalNum * 20)))}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={`Evaluation gauge: ${currentMove.eval}`}
+              >
                 <div
                   className="eval-bar-fill"
                   style={{ width: `${Math.min(95, Math.max(10, 50 + currentMove.evalNum * 20))}%` }}
@@ -111,9 +124,9 @@ export function ReviewsPage({ onNavigate, onPlay }: { onNavigate: (view: Landing
               </div>
             </div>
 
-            <div className="review-selected-box">
+            <div className="review-selected-box" aria-live="polite">
               <div className="selected-box-top">
-                <span className="selected-move-token">{currentMove.notation}</span>
+                <span className="selected-move-token" aria-hidden="true">{currentMove.notation}</span>
                 <div>
                   <h4>{currentMove.player === "You" ? "Your Move" : "Agent Response"}</h4>
                   <span>Move #{Math.ceil(currentMove.ply / 2)} &bull; {currentMove.boardPreview}</span>
@@ -123,7 +136,7 @@ export function ReviewsPage({ onNavigate, onPlay }: { onNavigate: (view: Landing
             </div>
 
             <div className="review-verifiable-note">
-              <ShieldCheck size={20} weight="fill" />
+              <ShieldCheck size={20} weight="fill" aria-hidden="true" />
               <div>
                 <strong>Auditable Rationale</strong>
                 <p>Every suggestion is backed by an MCP tool receipt, showing candidate legal moves and safety constraints.</p>

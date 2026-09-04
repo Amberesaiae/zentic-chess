@@ -17,9 +17,12 @@ export function HowItWorks({ onNavigate, onPlay }: { onNavigate: (view: LandingV
       <section className="explain-diagram-section" aria-label="Architecture diagram">
         <figure className="explain-diagram-figure">
           <img
-            src="/assets/zentic-how-it-works-diagram.png"
-            alt="Zentic How It Works: 1. You play (e4), 2. MCP reads structured position and legal moves, 3. Agent responds with suggested move Nf6 and written rationale."
+            src="/assets/zentic-how-it-works-diagram.webp"
+            alt="Diagram of Zentic Three-Stage Loop: 1. You play e4 on the live board; 2. WebMCP reads structured position, legal moves, and training state; 3. Zentic agent evaluates and drafts verified Nf6 proposal with human consent."
             className="explain-diagram-img"
+            width="1024"
+            height="533"
+            loading="lazy"
           />
           <figcaption className="explain-diagram-caption">
             <strong>The Three-Stage Loop:</strong> You play &rarr; WebMCP provides verified board context &rarr; Zentic agent explains and proposes with human confirmation.
